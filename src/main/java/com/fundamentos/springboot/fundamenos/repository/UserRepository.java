@@ -1,8 +1,6 @@
 package com.fundamentos.springboot.fundamenos.repository;
 
 import com.fundamentos.springboot.fundamenos.entity.User;
-import net.bytebuddy.TypeCache;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,4 +36,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     //Tambien se puede con Containing cambiando el nombre a findByNameContainingOrderByIdDesc
     //con lo que se evida traer en el metodo like las designaciones %%
     List<User> findByNameLikeOrderByIdDesc(String name);
+
+
 }

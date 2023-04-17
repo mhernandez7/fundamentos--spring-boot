@@ -7,6 +7,7 @@ import com.fundamentos.springboot.fundamenos.component.ComponentDependency;
 import com.fundamentos.springboot.fundamenos.entity.User;
 import com.fundamentos.springboot.fundamenos.pojo.UserPojo;
 import com.fundamentos.springboot.fundamenos.repository.UserRepository;
+import com.fundamentos.springboot.fundamenos.service.UserService;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,19 +36,21 @@ public class FundamenosApplication implements CommandLineRunner {
 	private MyBeanWithProperties myBeanWithProperties;
 	private UserPojo userPojo;
 	private UserRepository userRepository;
+	private UserService userService;
 
 
 	//Se crea el constructor para hacer uso de nuestras dependencias
 	//@Qualifer nos permite definr que dependencia vamos a utilizar
 	public FundamenosApplication(@Qualifier("componentTwoImplement") ComponentDependency componentDependency
 			, MyBean myBean, MyBeanWithDependency myBeanWithDependency, MyBeanWithProperties myBeanWithProperties,
-								 UserPojo userPojo, UserRepository userRepository){
+								 UserPojo userPojo, UserRepository userRepository, UserService userService){
 		this.componentDependency = componentDependency;
 		this.myBean = myBean;
 		this.myBeanWithDependency = myBeanWithDependency;
 		this.myBeanWithProperties = myBeanWithProperties;
 		this.userPojo = userPojo;
 		this.userRepository = userRepository;
+		this.userService = userService;
 	}
 
 	public static void main(String[] args) {
@@ -63,6 +66,27 @@ public class FundamenosApplication implements CommandLineRunner {
 		//ejemplosAnteriores();
 		saveUsersInDataBase();
 		getInformationJpqlFromUser();
+		saveWithErrorTransactional();
+	}
+
+	private void saveWithErrorTransactional(){
+
+		User test1 = new User("Test1Transactional1", "TestTransactional1@domain.com",LocalDate.now());
+		User test2 = new User("Test2Transactional1", "Test2Transactional1@domain.com",LocalDate.now());
+		User test3 = new User("Test3Transactional1", "Test3Transactional1@domain.com",LocalDate.now());
+		User test4 = new User("Test4Transactional1", "TestT4ransactional1@domain.com",LocalDate.now());
+
+		List<User> users = Arrays.asList(test1, test2, test3, test4);
+
+		try {
+			userService.saveTransactional(users);
+		}catch (Exception e){
+			LOGGER.error("Exeption dentro del metodo transaccional ");
+		}
+
+
+		userService.getAllUsers().stream()
+				.forEach(user -> LOGGER.info("Ususario dentro de transactional: "+user));
 	}
 
 	private void getInformationJpqlFromUser(){
@@ -96,6 +120,7 @@ public class FundamenosApplication implements CommandLineRunner {
 
 		userRepository.findByNameLikeOrderByIdDesc("%user%")
 				.stream().forEach(user -> LOGGER.info("usuario por name y orden por id "+user));
+
 	}
 
 
